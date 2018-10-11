@@ -83,6 +83,8 @@ func (cmd *AgentCommand) readConfig() *agent.Config {
 			" that persists in the data-dir.")
 
 	f.BoolVar(&cmdCfg.EnableScriptChecks, "enable-script-checks", false, "Enables health check scripts.")
+	f.BoolVar(&cmdCfg.EnableLocalScriptChecks, "enable-local-script-checks", false,
+		"Enables health check scripts registered locally in config files (but not via API).")
 	var disableHostNodeID configutil.BoolValue
 	f.Var(&disableHostNodeID, "disable-host-node-id",
 		"Setting this to true will prevent Consul from using information from the"+
@@ -181,6 +183,10 @@ func (cmd *AgentCommand) readConfig() *agent.Config {
 
 	if err := cmd.BaseCommand.Parse(cmd.args); err != nil {
 		return nil
+	}
+
+	if cmdCfg.EnableScriptChecks {
+		cmdCfg.EnableLocalScriptChecks = true
 	}
 
 	// check deprecated flags
